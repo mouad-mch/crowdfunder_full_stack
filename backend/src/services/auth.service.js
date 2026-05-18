@@ -48,8 +48,11 @@ export const loginUser = async (data) => {
         role: user.role
     })
 
+    user.password = undefined
+
     return {
         success: true,
-        token
+        token,
+        user
     }
 }
