@@ -1,1 +1,80 @@
-@import 'tailwindcss'
+@import "tailwindcss";
+
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --font-sans: "Geist", system-ui, sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 270 20% 98%;
+    --foreground: 270 15% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 270 15% 15%;
+
+    --primary: 270 50% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 270 30% 95%;
+    --secondary-foreground: 270 30% 25%;
+
+    --muted: 270 15% 95%;
+    --muted-foreground: 270 10% 45%;
+
+    --accent: 280 60% 92%;
+    --accent-foreground: 270 50% 30%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 270 15% 90%;
+    --input: 270 15% 92%;
+    --ring: 270 50% 55%;
+
+    --radius: 0.625rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
