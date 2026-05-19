@@ -1,4 +1,4 @@
-import { Folder, LayoutDashboard } from 'lucide-react'
+import { CirclePlus, Folder, LayoutDashboard, LogOut } from 'lucide-react'
 import { NavLink } from 'react-router-dom';
 
 const NAVLINK = [
@@ -12,6 +12,12 @@ const NAVLINK = [
         to: '/projects',
         label: 'Projects',
         icon: <Folder />
+    },
+
+    {
+      to: '/projects/create',
+      label: 'Create Project',
+      icon: <CirclePlus />
     }
 ]
 
@@ -61,6 +67,27 @@ const Sidebar = () => {
                 ))
             }
         </nav>
+
+        <div className="border-t border-border p-3 space-y-2">
+            <div className="flex items-center gap-3 px-3 py-2">
+              <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full">
+                <img src="../../public/avatar.jpg" alt="avatar"  className='w-full h-full'/>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">Mouad</p>
+                <p className="text-xs text-muted-foreground truncate">
+                  mouad@gmail.com
+                </p>
+              </div>
+            </div>
+
+          <button
+            className="flex w-full items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+          >
+            <LogOut/>
+            Logout
+          </button>
+        </div>
 
       </div>
     </aside>
