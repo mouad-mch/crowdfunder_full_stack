@@ -1,9 +1,51 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { register } from "../store/slices/authSlice.js";
 
 const Register = () => {
-
-
     
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { state, error } = useSelector((state) => state.auth);
+
+  const [form, setForm] = useState({
+    name:"",
+    email:"",
+    password:"",
+    confirm:"",
+  })
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if(form.password !== form.confirm) {
+      toast.error("Passwords do not match")
+      return;
+    }
+
+    const result = await dispatch(
+      register({
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        role: "owner",
+      })
+    )
+
+    if(register.fulfilled.match(result)) {
+      toast.success("Registered successfully");
+      navigate('/login')
+    }
+  }
+
+  const isLoading = state === "loading";
 
 
   return (
@@ -40,17 +82,20 @@ const Register = () => {
           </p>
         </div>
 
-        <form className="form flex flex-col gap-4 mb-5">
+        <form onSubmit={handleSubmit} className="form flex flex-col gap-4 mb-5">
           <div className="form-field">
             <label htmlFor="name" className="form-label">
               Full name
             </label>
             <input
+              required
               type="text"
               id="name"
               name="name"
               className="form-input border border-border rounded-lg focus:ring focus:border-ring"
               placeholder="John Doe"
+              value={form.name ?? ""}
+              onChange={handleChange}
             />
           </div>
 
@@ -59,11 +104,14 @@ const Register = () => {
               Email
             </label>
             <input
+              required
               type="email"
               id="email"
               name="email"
               className="form-input border border-border rounded-lg focus:ring focus:border-ring"
               placeholder="you@example.com"
+              value={form.email ?? ""}
+              onChange={handleChange}
             />
           </div>
 
@@ -72,11 +120,14 @@ const Register = () => {
               Password
             </label>
             <input
+              required
               type="password"
               id="password"
               name="password"
               className="form-input border border-border rounded-lg focus:ring focus:border-ring"
               placeholder="At least 6 characters"
+              value={form.password ?? ""}
+              onChange={handleChange}
             />
           </div>
 
@@ -85,11 +136,14 @@ const Register = () => {
               Confirm password
             </label>
             <input
+              required
               type="password"
-              id="confirmPassword"
-              name="confirmPassword"
+              id="confirm"
+              name="confirm"
               className="form-input border border-border rounded-lg focus:ring focus:border-ring"
               placeholder="Repeat your password"
+              onChange={handleChange}
+              value={form.confirm ?? ""}
             />
           </div>
 
@@ -97,7 +151,7 @@ const Register = () => {
             type="submit"
             className="btn btn-primary bg-primary text-white cursor-pointer hover:bg-primary/50"
           >
-            Create account
+            {isLoading ? "Create account..." : "create account"}
           </button>
         </form>
 
