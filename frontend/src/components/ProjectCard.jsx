@@ -1,8 +1,8 @@
 import { Trash } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const ProjectCard = () => {
-  const isOpen = true;
+const ProjectCard = ({ project }) => {
+  const isOpen = project.status === "open";
   const progressWidth = "w-[35%]"
 
   return (
@@ -10,17 +10,17 @@ const ProjectCard = () => {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <Link className="font-semibold text-base hover:text-primary transition-colors line-clamp-1">
-            Updated Project Title
+            {project.title}
           </Link>
           <p className="line-clamp-2 text-sm text-foreground/50 mt-1">
-            This is the updated description for the project.
+            {project.description}
           </p>
         </div>
 
         <span
           className={`p-1 px-2 text-[12px] rounded-full font-medium w-fit ${isOpen ? "text-muted-foreground bg-primary/10" : "text-foreground bg-foreground/5"}`}
         >
-          open
+          {project.status}
         </span>
       </div>
 

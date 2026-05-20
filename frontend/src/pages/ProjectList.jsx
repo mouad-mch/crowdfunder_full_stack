@@ -1,12 +1,19 @@
 import { Plus, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SegmentedControl from '../components/UI/SegmentedControl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from "react-redux";
 import ProjectCard from '../components/ProjectCard';
+import { fetchMyProjects } from '../store/slices/projectsSlice.js';
 
 const ProjectList = () => {
-
+  const dispatch = useDispatch();
+  const { items, loading, status, error } = useSelector((state) => state.projects)
   const [filter, setFilter] = useState('all')
+
+  useEffect(() => {
+    dispatch(fetchMyProjects())
+  }, [dispatch])
 
   return (
     <div>
@@ -39,8 +46,8 @@ const ProjectList = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-5">
         {
-          [1, 2, 3, 4].map((p) => (
-            <ProjectCard key={p}/>
+          items.map((p) => (
+            <ProjectCard key={p._id} project={p}/>
           ))
         }
       </div>
