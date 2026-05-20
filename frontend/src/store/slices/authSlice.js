@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api } from "../../api/axios.js";
+import { redirect } from "react-router-dom";
 
 const storeUser = localStorage.getItem("user");
 
@@ -21,6 +22,18 @@ export const login = createAsyncThunk(
     }
   },
 );
+
+export const register = createAsyncThunk(
+  "auth/register",
+  async ( credential , { rejectWithValue }) => {
+    try {
+      const data = await api.post("/auth/register", credential);
+      return data;
+    }catch(error) {
+      return rejectWithValue(error.response?.data?.message || "Register failed")
+    }
+  }
+)
 
 const authSlice = createSlice({
   name: "auth",
@@ -55,7 +68,19 @@ const authSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
-      });
+      })
+      // register------------
+      .addCase(register.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(register.fulfilled, (state, action) => {
+        state.status = "succeeded";
+      })
+      .addCase(register.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload
+      })
   },
 });
 

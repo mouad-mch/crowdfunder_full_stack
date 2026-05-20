@@ -1,5 +1,8 @@
 import { CirclePlus, Folder, LayoutDashboard, LogOut } from 'lucide-react'
-import { NavLink } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { logout } from '../store/slices/authSlice.js';
+import toast from 'react-hot-toast';
 
 const NAVLINK = [
     {
@@ -22,6 +25,17 @@ const NAVLINK = [
 ]
 
 const Sidebar = () => {
+
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    dispatch(logout());
+    toast.success('Logged out successfully')
+    navigate('/login');
+  }
+
   return (
     <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-card border-r border-border">
       <div className="flex flex-col h-full">
@@ -74,14 +88,15 @@ const Sidebar = () => {
                 <img src="../../public/avatar.jpg" alt="avatar"  className='w-full h-full'/>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">Mouad</p>
+                <p className="text-sm font-medium truncate">{ user?.name ?? "Mouad"}</p>
                 <p className="text-xs text-muted-foreground truncate">
-                  mouad@gmail.com
+                  { user?.email ?? "Mouad@gmail.com" }
                 </p>
               </div>
             </div>
 
           <button
+            onClick={handleLogout}
             className="flex w-full items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
           >
             <LogOut/>
