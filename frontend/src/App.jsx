@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom"
 import DashboardLayout from "./layout/DashboardLayout"
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ProjectList from "./pages/ProjectList";
 
 
 function App() {
@@ -17,7 +18,7 @@ function App() {
       >
 
         <Route path="/" element={<h1>Dashboard</h1>} />
-        <Route path="/projects" element={<h1>Project List</h1>} />
+        <Route path="/projects" element={<ProjectList />} />
         <Route path="/projects/create" element={<h1>Create Project</h1>} />
         <Route path="/projects/:id" element={<h1>Project Detail</h1>} />
         <Route path="/projects/:id/edit" element={<h1>Update Project</h1>} />
