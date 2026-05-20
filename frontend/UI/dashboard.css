@@ -1,0 +1,75 @@
+.dashboard {
+  padding: 30px;
+  min-height: 100vh;
+  background-color: #f8f8fb;
+  font-family: "Inter", sans-serif;
+}
+
+/* ===== Title ===== */
+.dashboard h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 30px;
+}
+/* ===== Grid ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+}
+
+/* ===== Card ===== */
+.stat-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 24px;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+/* ===== Card Title ===== */
+.stat-card h3 {
+  font-size: 15px;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 18px;
+}
+
+/* ===== Card Value ===== */
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* ===== Loading ===== */
+.dashboard-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 20px;
+  font-weight: 600;
+  color: #7c3aed;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 20px;
+  } 
+
+  .dashboard h1 {
+    font-size: 26px;
+  }
+  
+  .stat-value {
+    font-size: 26px;
+  }
+}
