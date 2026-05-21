@@ -29,11 +29,25 @@ export const fetchProjectById = createAsyncThunk(
   "projects/fetchOne",
   async (id, { rejectWithValue }) => {
     try {
-      const { data } = await api.get(`/projects/${id}`);
-      return data.project || data;
+      const data = await api.get(`/projects/${id}`);
+      return data.projects?.project || data.projects || data;
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message || "Failed to load project.",
+      );
+    }
+  },
+);
+
+export const closeProject = createAsyncThunk(
+  "projects/closeProject",
+  async (id, { rejectWithValue }) => {
+    try {
+      const data = await api.patch(`/projects/${id}`);
+      return data.project;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to close project.",
       );
     }
   },
@@ -48,6 +62,20 @@ export const deleteProject = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to delete the project",
+      );
+    }
+  },
+);
+
+export const fetchProjectInvestors = createAsyncThunk(
+  "projects/fetchInvestors",
+  async (id, { rejectWithValue }) => {
+    try {
+      const data = await api.get(`/projects/${id}/investors`);
+      return data.investors || [];
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to load investors.",
       );
     }
   },
@@ -118,7 +146,32 @@ const projectSlice = createSlice({
         state.error = action.payload;
       })
 
-      // All projects 
+      // close project
+      .addCase(closeProject.fulfilled, (state, action) => {
+        const updated = action.payload;
+        if (!updated) return;
+        state.selected = updated;
+        const idx = state.items.findIndex((p) => p._id === updated._id);
+        if (idx !== -1) state.items[idx] = updated;
+      })
+      .addCase(closeProject.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+
+      // investors
+      .addCase(fetchProjectInvestors.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchProjectInvestors.fulfilled, (state, action) => {
+        state.loading = false;
+        state.investors = action.payload;
+      })
+      .addCase(fetchProjectInvestors.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // All projects
 
       .addCase(getAllProject.pending, (state) => {
         state.status = "loading";
