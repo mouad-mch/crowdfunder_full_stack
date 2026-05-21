@@ -9,6 +9,7 @@ import { invest } from '../controllers/investment.controller.js';
 
 
 
+
 const router = express.Router();
 router.use(authMiddleware);
 
@@ -75,7 +76,7 @@ router.use(authMiddleware);
  *       500:
  *         description: Internal server error
  */
-router.get('/all', roleMiddleware('admin'), getAllProjects)
+router.get('/all', getAllProjects)
 
 
 // owner
@@ -562,7 +563,6 @@ router
    .post('/:id/invest', roleMiddleware('investor'), validateBody(investmentSchema), invest)
    .get('/', roleMiddleware('investor'), getOpenProjects)
    .get('/:id', roleMiddleware('investor', 'owner', 'admin'), getProjectById)
-
 
 
 
