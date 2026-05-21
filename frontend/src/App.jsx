@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router-dom"
 import DashboardLayout from "./layout/DashboardLayout"
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -25,6 +25,8 @@ function App() {
         <Route path="/projects/:id/edit" element={<h1>Update Project</h1>} />
         <Route path="/projects/:id/investors" element={<h1>Investors</h1>} />
       </Route>
+
+      <Route path="*" element={ <Navigate to={"/"} replace /> } />
 
     </Routes>
   )
