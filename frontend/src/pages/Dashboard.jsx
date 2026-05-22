@@ -1,7 +1,5 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-// import { fetchProjects } from '../store/slices/projectSlice';
-import './Dashboard.css';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,7 +11,8 @@ import {
   ArcElement,
 } from 'chart.js';
 import { Bar, Doughnut } from 'react-chartjs-2';
-import './Dashboard.css';
+import { fetchMyProjects } from '../store/slices/projectsSlice.js';
+import '../UI/Dashboard.css';
 
 ChartJS.register(
   CategoryScale,
@@ -30,7 +29,7 @@ const Dashboard = () => {
   const { items, loading } = useSelector((state) => state.projects);
 
   useEffect(() => {
-    dispatch(fetchProjects());
+    dispatch(fetchMyProjects());
   }, [dispatch]);
 
   const totalProjects = items.length;
