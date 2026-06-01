@@ -15,9 +15,9 @@ const request = async (method, path, body) => {
         }
     }
 
-    const res = 
-        body !== undefined
-        ? await axios[method](`${BASE_URL}${path}`, body, config)
+    const needsBody = ['post', 'put', 'patch'].includes(method);
+    const res = needsBody
+        ? await axios[method](`${BASE_URL}${path}`, body ?? {}, config)
         : await axios[method](`${BASE_URL}${path}`, config)
 
     return res.data

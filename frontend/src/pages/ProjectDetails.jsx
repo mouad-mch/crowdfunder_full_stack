@@ -7,8 +7,8 @@ import {
   deleteProject,
   closeProject,
   clearSelected,
+  clearError,
 } from "../store/slices/projectsSlice";
-import { clearError } from "../store/slices/authSlice";
 import { ArrowLeft, ArrowRight, Edit, Trash } from "lucide-react";
 
 const formatDate = (dateStr) => {
