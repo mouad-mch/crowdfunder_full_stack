@@ -9,6 +9,9 @@ import Investors from "./pages/Investors";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import AuthRedirect from "./components/AuthRedirect";
 import CreateProject from "./pages/CreateProject";
+import Wallet from "./pages/Wallet";
+import Portfolio from "./pages/Portfolio";
+import RoleRoutes from "./components/RoleRoutes";
 
 
 function App() {
@@ -39,10 +42,27 @@ function App() {
 
         <Route path="/" element={<Dashboard />} />
         <Route path="/projects" element={<ProjectList />} />
-        <Route path="/projects/create" element={<CreateProject />} />
+        <Route path="/projects/create" element={
+          <RoleRoutes role={"owner"}>
+            <CreateProject />
+          </RoleRoutes>
+          } 
+        />
         <Route path="/projects/:id" element={<ProjectDetails />} />
         <Route path="/projects/:id/edit" element={<h1>Update Project</h1>} />
         <Route path="/projects/:id/investors" element={<Investors />} />
+        <Route path="/wallet" element={
+          <RoleRoutes role={'investor'}>
+            <Wallet />
+          </RoleRoutes>
+          } 
+        />
+        <Route path="/portfolio" element={
+          <RoleRoutes role={'investor'}>
+            <Portfolio />
+          </RoleRoutes>
+        } 
+        />
       </Route>
 
       <Route path="*" element={ <Navigate to={"/"} replace /> } />

@@ -13,7 +13,7 @@ export const fetchBalance = createAsyncThunk(
     async (userId, { rejectWithValue }) => {
         try {
             const data = await api.get(`/users/${userId}`);
-            return data.balance;
+            return data.data.balance;
         }catch(err) {
             return rejectWithValue(err.response?.data?.message || err.message);
         }
@@ -25,7 +25,7 @@ export const deposit = createAsyncThunk(
     async ({ amount }, { rejectWithValue }) => {
         try {
             const data = await api.post(`/users/deposit`, { amount });
-            return data.balance;
+            return data.data.balance;
         } catch (err) {
             return rejectWithValue(err.response?.data?.message || err.message);
         }
