@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
@@ -9,7 +9,8 @@ import {
   clearSelected,
   clearError,
 } from "../store/slices/projectsSlice";
-import { ArrowLeft, ArrowRight, Edit, Trash } from "lucide-react";
+import { makeInvestment } from "../store/slices/investmentSlice";
+import { ArrowLeft, ArrowRight, Edit, Trash, Wallet } from "lucide-react";
 
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
@@ -30,6 +31,8 @@ const ProjectDetails = () => {
   const { selected: project, loading, error } = useSelector(
     (state) => state.projects,
   );
+  const { user } = useSelector((state) => state.auth);
+  const [isInvesting, setIsInvesting] = useState(false);
 
   useEffect(() => {
     dispatch(fetchProjectById(id));
@@ -89,6 +92,25 @@ const ProjectDetails = () => {
     }
   };
 
+  const handleInvest = async () => {
+    const amount = window.prompt("Enter the amount you want to invest (MAD):");
+    if (!amount || isNaN(amount) || Number(amount) <= 0) {
+      if (amount !== null) toast.error("Please enter a valid amount.");
+      return;
+    }
+
+    setIsInvesting(true);
+    const result = await dispatch(makeInvestment({ projectId: project._id, amount: Number(amount) }));
+    setIsInvesting(false);
+
+    if (makeInvestment.fulfilled.match(result)) {
+      toast.success("Investment successful!");
+      dispatch(fetchProjectById(id)); // Refresh project data
+    } else {
+      toast.error(result.payload || "Investment failed.");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Link
@@ -124,30 +146,45 @@ const ProjectDetails = () => {
 
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-2">
-            {isOpen && (
-              <>
-                <Link
-                  to={`/projects/${id}/edit`}
-                  className="btn-outline rounded-lg bg-primary/70 text-white hover:bg-primary/50 flex items-center gap-2 h-9 px-3 text-sm"
-                >
-                    <Edit size={"16"}/>
-                  Edit
-                </Link>
+            {user?.role === "investor" ? (
+              isOpen && (
                 <button
-                  onClick={handleClose}
-                  className="btn-outline h-9 px-3 text-sm  rounded-lg bg-foreground/50 text-white hover:bg-foreground/70"
+                  onClick={handleInvest}
+                  disabled={isInvesting}
+                  className="btn-primary rounded-lg bg-primary text-white hover:bg-primary/80 flex items-center gap-2 h-9 px-4 text-sm font-medium transition-colors disabled:opacity-50"
                 >
-                  Close project
+                  <Wallet size={"16px"} />
+                  {isInvesting ? "Investing..." : "Invest in this project"}
+                </button>
+              )
+            ) : (
+              <>
+                {isOpen && (
+                  <>
+                    <Link
+                      to={`/projects/${id}/edit`}
+                      className="btn-outline rounded-lg bg-primary/70 text-white hover:bg-primary/50 flex items-center gap-2 h-9 px-3 text-sm"
+                    >
+                        <Edit size={"16"}/>
+                      Edit
+                    </Link>
+                    <button
+                      onClick={handleClose}
+                      className="btn-outline h-9 px-3 text-sm  rounded-lg bg-foreground/50 text-white hover:bg-foreground/70"
+                    >
+                      Close project
+                    </button>
+                  </>
+                )}
+                <button
+                  onClick={handleDelete}
+                  className="btn-destructive  rounded-lg bg-red-500/70 text-white hover:bg-red-500/50 flex items-center gap-2 h-9 px-3 text-sm"
+                >
+                    <Trash size={"16px"}/>
+                  Delete
                 </button>
               </>
             )}
-            <button
-              onClick={handleDelete}
-              className="btn-destructive  rounded-lg bg-red-500/70 text-white hover:bg-red-500/50 flex items-center gap-2 h-9 px-3 text-sm"
-            >
-                <Trash size={"16px"}/>
-              Delete
-            </button>
           </div>
         </div>
 
