@@ -1,7 +1,9 @@
-import { Trash } from "lucide-react";
+import { Trash, Wallet } from "lucide-react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 const ProjectCard = ({ project, Delete }) => {
+  const { user } = useSelector((state) => state.auth);
   const isOpen = project.status === "open";
   const capital = project.capital;
   
@@ -11,7 +13,7 @@ const ProjectCard = ({ project, Delete }) => {
     <div className="card p-5 flex flex-col gap-4 hover:shadow-md transition-shadow border border-border rounded-lg cursor-pointer">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <Link className="font-semibold text-base hover:text-primary transition-colors line-clamp-1">
+          <Link to={`/projects/${project._id}`} className="font-semibold text-base hover:text-primary transition-colors line-clamp-1">
             {project.title}
           </Link>
           <p className="line-clamp-2 text-sm text-foreground/50 mt-1">
@@ -39,15 +41,26 @@ const ProjectCard = ({ project, Delete }) => {
         </div>
       </div>
 
-      <div className="w-full border-t border-border pt-2 flex items-center justify-between">
+      <div className="w-full border-t border-border pt-2 flex items-center justify-between gap-2">
         <Link to={`/projects/${project._id}`} className="flex-1 text-center hover:bg-primary/40 py-2 rounded-lg transition-all duration-75 cursor-pointer">
             View details
         </Link>
-        <div 
-          onClick={ () => Delete(project) }
-          className="p-2 hover:bg-red-400/10 rounded-[3px] transition-all duration-100">
-            <Trash size={"20px"} className="text-red-500"/>
-        </div>
+        {user?.role === "investor" && isOpen && (
+          <Link 
+            to={`/projects/${project._id}`} 
+            className="flex-1 text-center bg-primary text-white py-2 rounded-lg hover:bg-primary/80 transition-all duration-75 flex items-center justify-center gap-2"
+          >
+            <Wallet size={"16px"}/>
+            Invest
+          </Link>
+        )}
+        {user?.role !== "investor" && (
+          <div 
+            onClick={ () => Delete(project) }
+            className="p-2 hover:bg-red-400/10 rounded-[3px] transition-all duration-100">
+              <Trash size={"20px"} className="text-red-500"/>
+          </div>
+        )}
       </div>
 
     </div>
