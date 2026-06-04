@@ -15,7 +15,13 @@ import swaggerSpec from "./config/swagger.js";
 const app = express();
 app.use(helmet());
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: [
+        'https://crowdfunder-full-stack-1.onrender.com',
+        'http://localhost:5173',
+    ],
+    credentials: true,
+}));
 app.use(morgan('dev'))
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
