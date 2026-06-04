@@ -31,11 +31,13 @@ const Dashboard = () => {
   useEffect(() => {
     dispatch(fetchMyProjects());
   }, [dispatch]);
+  
+  console.log(items);
 
   const totalProjects = items.length;
   const openProjects = items.filter(p => p.status === 'open').length;
   const closedProjects = items.filter(p => p.status === 'closed').length;
-  const totalCapitalRaised = items.reduce((sum, p) => sum + (p.investedAmount || 0), 0);
+  const totalCapitalRaised = items.reduce((sum, p) => sum + (p.initialInvestment || 0), 0);
 
   const doughnutData = {
     labels: ['Open Projects', 'Closed Projects'],
@@ -54,7 +56,7 @@ const Dashboard = () => {
     datasets: [
       {
         label: 'Capital Raised ($)',
-        data: items.slice(0, 7).map(p => p.investedAmount || 0),
+        data: items.slice(0, 7).map(p => p.initialInvestment || 0),
         backgroundColor: '#2563eb',
         borderRadius: 6,
       },
