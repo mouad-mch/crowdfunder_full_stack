@@ -109,7 +109,7 @@ export const getInvestorPortfolio_s = async (investorId) => {
         amount: inv.amount,
         percentage: inv.projectId
             ? ((inv.amount / inv.projectId.capital) * 100).toFixed(2) + '%': 'N/A',
-        investedAt: inv.createAt,
+        investedAt: inv.createdAt,
     }))
 
     return {

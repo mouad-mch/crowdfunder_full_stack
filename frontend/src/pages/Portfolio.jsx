@@ -4,18 +4,7 @@ import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { TrendingUp, Briefcase, ArrowRight } from "lucide-react";
 import { fetchPortfolio, clearError } from "../store/slices/investmentSlice";
-
-const formatMoney = (amount) =>
-  `MAD ${Number(amount ?? 0).toLocaleString()}`;
-
-const formatDate = (dateStr) => {
-  if (!dateStr) return "—";
-  return new Date(dateStr).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-};
+import { formatMoney, formatDate } from "../utils/formatters.js";
 
 const Portfolio = () => {
   const dispatch = useDispatch();
@@ -45,6 +34,9 @@ const Portfolio = () => {
     );
   }
 
+  const projectsIds = portfolio?.investments.map((inv) => inv.project?._id);
+  const ids = new Set(projectsIds);
+  console.log("investments", portfolio?.investments)
 
   return (
     <div className="space-y-6">
@@ -71,7 +63,7 @@ const Portfolio = () => {
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Projects Funded</p>
-            <p className="text-xl font-bold">{portfolio?.investmentsCount ?? 0}</p>
+            <p className="text-xl font-bold">{ids.size ?? 0}</p>
           </div>
         </div>
       </div>

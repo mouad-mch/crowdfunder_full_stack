@@ -11,18 +11,9 @@ import {
 } from "../store/slices/projectsSlice";
 import { makeInvestment } from "../store/slices/investmentSlice";
 import { ArrowLeft, ArrowRight, Edit, Trash, Wallet, X } from "lucide-react";
+import { closeModal, openModal } from "../store/slices/modalSlice.js";
+import { formatDate, formatMoney } from "../utils/formatters.js";
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return "";
-  return new Date(dateStr).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-};
-
-const formatMoney = (amount) =>
-  `MAD ${Number(amount ?? 0).toLocaleString()}`;
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -33,8 +24,8 @@ const ProjectDetails = () => {
   );
   const { user } = useSelector((state) => state.auth);
   const [isInvesting, setIsInvesting] = useState(false);
-  const [showInvestModal, setShowInvestModal] = useState(false);
-  const [investAmount, setInvestAmount] = useState("");
+  const { isModalOpen, amount } = useSelector((state) => state.modal);
+
 
   useEffect(() => {
     dispatch(fetchProjectById(id));
@@ -64,10 +55,6 @@ const ProjectDetails = () => {
   const current = project.initialInvestment ?? 0;
   const percentage = target > 0 ? Math.min((current / target) * 100, 100) : 0;
 
-  const closeModal = () => {
-    setShowInvestModal(false);
-    setInvestAmount("");
-  };
 
   const handleDelete = async () => {
     const confirmed = window.confirm(
@@ -101,20 +88,20 @@ const ProjectDetails = () => {
 
   const handleInvest = async (e) => {
     e.preventDefault();
-    if (!investAmount || isNaN(investAmount) || Number(investAmount) <= 0) {
+    if (!amount || isNaN(amount) || Number(amount) <= 0) {
       toast.error("Please enter a valid amount.");
       return;
     }
 
     setIsInvesting(true);
     const result = await dispatch(
-      makeInvestment({ projectId: project._id, amount: Number(investAmount) }),
+      makeInvestment({ projectId: project._id, amount: Number(amount) }),
     );
     setIsInvesting(false);
 
     if (makeInvestment.fulfilled.match(result)) {
       toast.success("Investment successful!");
-      closeModal();
+      dispatch(closeModal());
       dispatch(fetchProjectById(id));
     } else {
       toast.error(result.payload || "Investment failed.");
@@ -163,7 +150,7 @@ const ProjectDetails = () => {
             {user?.role === "investor" ? (
               isOpen && (
                 <button
-                  onClick={() => setShowInvestModal(true)}
+                  onClick={() => dispatch(openModal())}
                   className="btn-primary rounded-lg bg-primary text-white hover:bg-primary/80 flex items-center gap-2 h-9 px-4 text-sm font-medium transition-colors"
                 >
                   <Wallet size={16} />
@@ -283,10 +270,10 @@ const ProjectDetails = () => {
       </div>
 
       {/* Invest modal */}
-      {showInvestModal && (
+      {isModalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          onClick={closeModal}
+          onClick={() => dispatch(closeModal())}
         >
           <div
             className="card bg-background border border-border rounded-xl shadow-xl w-full max-w-sm mx-4 p-6 space-y-5"
@@ -295,7 +282,7 @@ const ProjectDetails = () => {
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">Invest in {project.title}</h2>
               <button
-                onClick={closeModal}
+                onClick={() => dispatch(closeModal())}
                 className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 <X size={18} />
@@ -324,8 +311,8 @@ const ProjectDetails = () => {
                   type="number"
                   min="1"
                   step="1"
-                  value={investAmount}
-                  onChange={(e) => setInvestAmount(e.target.value)}
+                  value={amount}
+                  onChange={(e) => dispatch(openModal({ amount: e.target.value }))}
                   placeholder="e.g. 5000"
                   className="w-full h-10 px-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                   autoFocus
@@ -335,7 +322,7 @@ const ProjectDetails = () => {
               <div className="flex gap-3 pt-1">
                 <button
                   type="button"
-                  onClick={closeModal}
+                  onClick={() => dispatch(closeModal())}
                   className="flex-1 h-10 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors"
                 >
                   Cancel

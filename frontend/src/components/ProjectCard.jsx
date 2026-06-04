@@ -1,13 +1,18 @@
 import { Trash, Wallet } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { openModal } from "../store/slices/modalSlice.js";
 
 const ProjectCard = ({ project, Delete }) => {
   const { user } = useSelector((state) => state.auth);
   const isOpen = project.status === "open";
   const capital = project.capital;
+
+  const dispatch = useDispatch();
+
   
   const progressWidth = ((project.initialInvestment / capital) * 100).toFixed(2);
+
 
   return (
     <div className="card p-5 flex flex-col gap-4 hover:shadow-md transition-shadow border border-border rounded-lg cursor-pointer">
@@ -48,6 +53,7 @@ const ProjectCard = ({ project, Delete }) => {
         {user?.role === "investor" && isOpen && (
           <Link 
             to={`/projects/${project._id}`} 
+            onClick={() => dispatch(openModal({ amount: 0 }))}
             className="flex-1 text-center bg-primary text-white py-2 rounded-lg hover:bg-primary/80 transition-all duration-75 flex items-center justify-center gap-2"
           >
             <Wallet size={"16px"}/>

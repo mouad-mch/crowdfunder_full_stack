@@ -2,14 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { fetchProjectInvestors, clearError } from "../store/slices/projectsSlice";
-
-const formatMoney = (amount) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount ?? 0);
-
-const formatDate = (dateStr) =>
-  dateStr
-    ? new Date(dateStr).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
-    : "—";
+import { formatMoney, formatDate } from "../utils/formatters.js";
 
 const Investors = () => {
   const { id } = useParams();
