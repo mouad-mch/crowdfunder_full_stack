@@ -20,7 +20,7 @@ services:
     env_file:
       - ./backend/.env.dev
     environment:
-      - DATABASE_URL=mongodb://mongo:27017/Crowdfunder
+      - DATABASE_URL=mongodb+srv://mouadcharadi021_db_user:9OtH8jO2P8UibYyi@cluster0.coselis.mongodb.net/?appName=Cluster0
     depends_on:
       - mongo
     volumes:
