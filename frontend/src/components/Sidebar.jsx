@@ -1,4 +1,4 @@
-import { CirclePlus, Folder, LayoutDashboard, LogOut } from 'lucide-react'
+import { CirclePlus, Folder, LayoutDashboard, LogOut, Wallet, BriefcaseBusiness } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { logout } from '../store/slices/authSlice.js';
@@ -8,19 +8,34 @@ const NAVLINK = [
     {
         to: '/',
         label: 'Dashboard',
+        role: "all",
         icon: <LayoutDashboard />
     },
 
     {
         to: '/projects',
         label: 'Projects',
+        role: "all",
         icon: <Folder />
     },
 
     {
       to: '/projects/create',
       label: 'Create Project',
+      role: "owner",
       icon: <CirclePlus />
+    },
+    {
+      to: '/wallet',
+      label: 'Wallet',
+      role: "investor",
+      icon: <Wallet />
+    },
+    {
+      to: '/portfolio',
+      label: 'Portfolio',
+      role: 'investor',
+      icon: <BriefcaseBusiness />
     }
 ]
 
@@ -62,7 +77,7 @@ const Sidebar = () => {
 
         <nav className='flex-1 px-3 py-4 space-y-1'>
             {
-                NAVLINK.map((item) => (
+                NAVLINK.filter(item => item.role === 'all' || item.role === user?.role).map((item) => (
                     <NavLink
                       key={item.to}
                       to={item.to}

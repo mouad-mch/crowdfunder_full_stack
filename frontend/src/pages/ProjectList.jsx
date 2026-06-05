@@ -55,19 +55,25 @@ const ProjectList = () => {
     <div>
       <div className="header flex items-center justify-between mb-5">
         <div className="title">
-          <h1 className="font-bold text-foreground text-2xl">Your projects</h1>
+          <h1 className="font-bold text-foreground text-2xl">
+            {user?.role === "investor" ? "All projects" : "Your projects"}
+          </h1>
           <p className="text-foreground/60 text-[16px]">
-            Manage all your funding campaigns in one place.
+            {user?.role === "investor" 
+              ? "Discover and invest in new funding campaigns."
+              : "Manage all your funding campaigns in one place."}
           </p>
         </div>
 
-        <Link
-          to={"/projects/create"}
-          className="flex items-center gap-2 bg-primary px-2 py-2 rounded-md text-white font-medium hover:bg-primary/50 transition-all duration-75"
-        >
-          <Plus />
-          Create Project
-        </Link>
+        {user?.role !== "investor" && (
+          <Link
+            to={"/projects/create"}
+            className="flex items-center gap-2 bg-primary px-2 py-2 rounded-md text-white font-medium hover:bg-primary/50 transition-all duration-75"
+          >
+            <Plus />
+            Create Project
+          </Link>
+        )}
       </div>
 
       <div className="filter flex items-center gap-3">

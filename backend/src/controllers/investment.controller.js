@@ -1,4 +1,4 @@
-import { getInvestorInvestments_s, getInvestorPortfolio_s, invest_s } from "../services/investment.service.js"
+import { getInvestorInvestments_s, getInvestorPortfolio_s, getOwnerPortfolio_s, invest_s } from "../services/investment.service.js"
 
 
 export const invest = async (req, res) => {

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
@@ -7,21 +7,13 @@ import {
   deleteProject,
   closeProject,
   clearSelected,
+  clearError,
 } from "../store/slices/projectsSlice";
-import { clearError } from "../store/slices/authSlice";
-import { ArrowLeft, ArrowRight, Edit, Trash } from "lucide-react";
+import { makeInvestment } from "../store/slices/investmentSlice";
+import { ArrowLeft, ArrowRight, Edit, Trash, Wallet, X } from "lucide-react";
+import { closeModal, openModal } from "../store/slices/modalSlice.js";
+import { formatDate, formatMoney } from "../utils/formatters.js";
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return "";
-  return new Date(dateStr).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-};
-
-const formatMoney = (amount) =>
-  `MAD ${Number(amount ?? 0).toLocaleString()}`;
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -30,6 +22,10 @@ const ProjectDetails = () => {
   const { selected: project, loading, error } = useSelector(
     (state) => state.projects,
   );
+  const { user } = useSelector((state) => state.auth);
+  const [isInvesting, setIsInvesting] = useState(false);
+  const { isModalOpen, amount } = useSelector((state) => state.modal);
+
 
   useEffect(() => {
     dispatch(fetchProjectById(id));
@@ -58,6 +54,7 @@ const ProjectDetails = () => {
   const target = project.capital ?? 0;
   const current = project.initialInvestment ?? 0;
   const percentage = target > 0 ? Math.min((current / target) * 100, 100) : 0;
+
 
   const handleDelete = async () => {
     const confirmed = window.confirm(
@@ -89,13 +86,35 @@ const ProjectDetails = () => {
     }
   };
 
+  const handleInvest = async (e) => {
+    e.preventDefault();
+    if (!amount || isNaN(amount) || Number(amount) <= 0) {
+      toast.error("Please enter a valid amount.");
+      return;
+    }
+
+    setIsInvesting(true);
+    const result = await dispatch(
+      makeInvestment({ projectId: project._id, amount: Number(amount) }),
+    );
+    setIsInvesting(false);
+
+    if (makeInvestment.fulfilled.match(result)) {
+      toast.success("Investment successful!");
+      dispatch(closeModal());
+      dispatch(fetchProjectById(id));
+    } else {
+      toast.error(result.payload || "Investment failed.");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Link
         to="/projects"
         className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
       >
-          <ArrowLeft size={"16px"} />
+        <ArrowLeft size={16} />
         Back to projects
       </Link>
 
@@ -113,7 +132,11 @@ const ProjectDetails = () => {
                     : "text-foreground bg-foreground/5"
                 }`}
               >
-                <div className={`w-1 h-1 rounded-full animate-ping ${isOpen ? "bg-primary": "bg-foreground"}`}></div>
+                <div
+                  className={`w-1 h-1 rounded-full animate-ping ${
+                    isOpen ? "bg-primary" : "bg-foreground"
+                  }`}
+                />
                 {project.status}
               </span>
             </div>
@@ -124,30 +147,44 @@ const ProjectDetails = () => {
 
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-2">
-            {isOpen && (
-              <>
-                <Link
-                  to={`/projects/${id}/edit`}
-                  className="btn-outline rounded-lg bg-primary/70 text-white hover:bg-primary/50 flex items-center gap-2 h-9 px-3 text-sm"
-                >
-                    <Edit size={"16"}/>
-                  Edit
-                </Link>
+            {user?.role === "investor" ? (
+              isOpen && (
                 <button
-                  onClick={handleClose}
-                  className="btn-outline h-9 px-3 text-sm  rounded-lg bg-foreground/50 text-white hover:bg-foreground/70"
+                  onClick={() => dispatch(openModal())}
+                  className="btn-primary rounded-lg bg-primary text-white hover:bg-primary/80 flex items-center gap-2 h-9 px-4 text-sm font-medium transition-colors"
                 >
-                  Close project
+                  <Wallet size={16} />
+                  Invest in this project
+                </button>
+              )
+            ) : (
+              <>
+                {isOpen && (
+                  <>
+                    <Link
+                      to={`/projects/${id}/edit`}
+                      className="btn-outline rounded-lg bg-primary/70 text-white hover:bg-primary/50 flex items-center gap-2 h-9 px-3 text-sm"
+                    >
+                      <Edit size={16} />
+                      Edit
+                    </Link>
+                    <button
+                      onClick={handleClose}
+                      className="btn-outline h-9 px-3 text-sm rounded-lg bg-foreground/50 text-white hover:bg-foreground/70"
+                    >
+                      Close project
+                    </button>
+                  </>
+                )}
+                <button
+                  onClick={handleDelete}
+                  className="btn-destructive rounded-lg bg-red-500/70 text-white hover:bg-red-500/50 flex items-center gap-2 h-9 px-3 text-sm"
+                >
+                  <Trash size={16} />
+                  Delete
                 </button>
               </>
             )}
-            <button
-              onClick={handleDelete}
-              className="btn-destructive  rounded-lg bg-red-500/70 text-white hover:bg-red-500/50 flex items-center gap-2 h-9 px-3 text-sm"
-            >
-                <Trash size={"16px"}/>
-              Delete
-            </button>
           </div>
         </div>
 
@@ -212,7 +249,7 @@ const ProjectDetails = () => {
               {project.maxInvestmentPercentage}%
             </p>
           </div>
-            </div>
+        </div>
       </div>
 
       {/* Investors link */}
@@ -228,9 +265,81 @@ const ProjectDetails = () => {
           className="btn-outline h-10 px-4 border border-border rounded-lg flex items-center gap-3"
         >
           View investors
-          <ArrowRight size={"16px"} />
+          <ArrowRight size={16} />
         </Link>
       </div>
+
+      {/* Invest modal */}
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={() => dispatch(closeModal())}
+        >
+          <div
+            className="card bg-background border border-border rounded-xl shadow-xl w-full max-w-sm mx-4 p-6 space-y-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Invest in {project.title}</h2>
+              <button
+                onClick={() => dispatch(closeModal())}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <p className="text-sm text-muted-foreground">
+              Max per investor:{" "}
+              <span className="font-medium text-foreground">
+                {project.maxInvestmentPercentage}%
+              </span>{" "}
+              of{" "}
+              <span className="font-medium text-foreground">
+                {formatMoney(target)}
+              </span>
+              .
+            </p>
+
+            <form onSubmit={handleInvest} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium" htmlFor="invest-amount">
+                  Amount (MAD)
+                </label>
+                <input
+                  id="invest-amount"
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={amount}
+                  onChange={(e) => dispatch(openModal({ amount: e.target.value }))}
+                  placeholder="e.g. 5000"
+                  className="w-full h-10 px-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => dispatch(closeModal())}
+                  className="flex-1 h-10 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isInvesting}
+                  className="flex-1 h-10 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/80 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  <Wallet size={15} />
+                  {isInvesting ? "Investing..." : "Confirm"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

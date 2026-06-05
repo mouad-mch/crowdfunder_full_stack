@@ -95,6 +95,20 @@ export const getAllProject = createAsyncThunk(
   },
 );
 
+export const createProject = createAsyncThunk(
+  "projects/createProject",
+  async (projectData, { rejectWithValue }) => { 
+    try {
+      const data = await api.post(`/projects`, projectData);
+      return data.project;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to create the project",
+      );
+    }
+  },
+);
+
 const projectSlice = createSlice({
   name: "projects",
   initialState,
@@ -148,11 +162,8 @@ const projectSlice = createSlice({
 
       // close project
       .addCase(closeProject.fulfilled, (state, action) => {
-        const updated = action.payload;
-        if (!updated) return;
-        state.selected = updated;
-        const idx = state.items.findIndex((p) => p._id === updated._id);
-        if (idx !== -1) state.items[idx] = updated;
+        if (!action.payload) return;
+        state.selected = action.payload;
       })
       .addCase(closeProject.rejected, (state, action) => {
         state.error = action.payload;
@@ -185,6 +196,20 @@ const projectSlice = createSlice({
       .addCase(getAllProject.rejected, (state, action) => {
         state.status = "failed";
         ((state.loading = false), (state.error = action.payload));
+      })
+
+      // create project
+      .addCase(createProject.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(createProject.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.items.push(action.payload);
+      })
+      .addCase(createProject.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
       })
 
   },

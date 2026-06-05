@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import authRoutes from './routes/auth.routes.js';
 import projectRoutes from './routes/project.routes.js';
 import userRoutes from './routes/user.routes.js';
+import investmentRoutes from './routes/investment.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { notFound } from './middlewares/notFound.js';
 import swaggerUi from "swagger-ui-express";
@@ -14,7 +15,13 @@ import swaggerSpec from "./config/swagger.js";
 const app = express();
 app.use(helmet());
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: [
+        'https://crowdfunder-full-stack-1.onrender.com',
+        'http://localhost:5173',
+    ],
+    credentials: true,
+}));
 app.use(morgan('dev'))
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -31,6 +38,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes)
 app.use('/api/projects', projectRoutes)
 app.use('/api/users', userRoutes)
+app.use('/api/investments', investmentRoutes)
 
 app.use(notFound)
 app.use(errorHandler)
