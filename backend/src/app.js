@@ -18,6 +18,7 @@ app.use(express.json());
 app.use(cors({
     origin: [
         'https://crowdfunder-full-stack-1.onrender.com',
+        "https://crowdfunder-full-stack.vercel.app",
         'http://localhost:5173',
     ],
     credentials: true,
